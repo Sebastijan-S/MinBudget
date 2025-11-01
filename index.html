@@ -1,111 +1,248 @@
 <!doctype html>
 <html lang="en">
 <head>
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
-<title>Minimal Budget — 50/30/20</title>
+
+<title>MinBud — 50/30/20 Budgeting Tool</title>
+
+<meta name="description" content="The minimal 50/30/20 budget tracker. Quickly manage your needs, wants, and goals to maintain financial balance.">
+
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+<meta property="og:title" content="MinBud: Simple 50/30/20 Budgeting">
+<meta property="og:description" content="The minimal 50/30/20 budget tracker. Quickly manage your needs, wants, and goals to maintain financial balance.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://yourbudgedapp.com"> <meta property="og:image" content="https://yourbudgedapp.com/minbud-share-image.png"> <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MinBud: Simple 50/30/20 Budgeting">
+<meta name="twitter:description" content="The minimal 50/30/20 budget tracker. Quickly manage your needs, wants, and goals to maintain financial balance.">
+<meta name="twitter:image" content="https://yourbudgedapp.com/minbud-share-image.png"> <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>MinBud — 50/30/20</title>
 <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
-/* (same color variables and base styles as before) */
+/* --- Color Variables & Base Styles (Dark Mode Only) --- */
 :root{
-  --bg:#f7f8fb;--panel:#fff;--muted:#6b7280;--text:#0f172a;
-  --accent:#6d28d9;--success:#059669;--danger:#ef4444;--radius:14px;
+  --bg:#0b1220;
+  --panel:#121a2c;
+  --muted:#9aa4b2;
+  --text:#f3f4f6;
+  /* New Colors */
+  --accent:#f97316; /* Orange */
+  --income-btn:#10b981; /* Cool Green */
+  --outcome-btn:#ef4444; /* Red */
+  --danger:var(--outcome-btn);
+  --radius:14px;
+  /* Chart Colors */
+  --color-needs:#8b5cf6; /* Purple */
+  --color-wants:#f59e0b; /* Yellow/Gold */
+  --color-goals:#10b981; /* Green */
 }
-[data-theme="dark"]{
-  --bg:#0b1220;--panel:#121a2c;--muted:#9aa4b2;--text:#f3f4f6;
-  --accent:#8b5cf6;--success:#10b981;--danger:#fb7185;
+html,body{
+  height:100%;
+  margin:0;
+  font-family:'Lato',system-ui;
+  background:var(--bg);
+  color:var(--text);
+  /* INCREASED PADDING FOR FIXED HEADER AND FOOTER */
+  padding-bottom: 70px; 
+  padding-top: 80px; /* New padding for fixed header */
 }
-html,body{height:100%;margin:0;font-family:'Lato',system-ui;background:var(--bg);color:var(--text);}
-.app{max-width:420px;margin:20px auto;display:flex;flex-direction:column;min-height:calc(100vh - 40px);gap:16px;padding:16px;}
-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.app{
+  max-width:420px;
+  /* REMOVED top margin, adjusted bottom margin */
+  margin: 0 auto 20px auto; 
+  display:flex;
+  flex-direction:column;
+  min-height:calc(100vh - 40px - 70px - 80px); /* Adjust height calculation */
+  gap:16px;
+  padding: 0 16px; /* Removed vertical padding from .app, added to body/header/nav */
+}
+/* --- FIXED TOP HEADER STYLES --- */
+header{
+  position: fixed; /* Fixed to viewport */
+  top: 0;
+  left: 0;
+  right: 0;
+  max-width: 420px; /* Match app width */
+  margin: 0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+  padding: 15px 16px; /* Added vertical padding */
+  background:var(--panel);
+  border-bottom-left-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3); /* Top shadow */
+  z-index: 100;
+}
 .title{font-family:'Merriweather',serif;font-size:22px;}
 .subtitle{font-size:13px;color:var(--muted);font-family:'Merriweather',serif;}
-.card{background:var(--panel);border-radius:var(--radius);padding:16px;box-shadow:0 4px 16px rgba(0,0,0,0.06);}
+.card{background:var(--panel);border-radius:var(--radius);padding:16px;box-shadow:0 4px 16px rgba(0,0,0,0.3);}
 label.small{font-size:13px;color:var(--muted);display:block;margin-bottom:6px;font-family:'Merriweather',serif;}
-input,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(0,0,0,0.08);font-size:15px;outline:none;color:var(--text);background-color:rgba(255,255,255,0.8);}
-[data-theme="dark"] input,[data-theme="dark"] select{background-color:#1f2937;border:1px solid rgba(255,255,255,0.08);color:var(--text);}
-.btn{padding:10px 14px;border-radius:10px;border:none;background:var(--accent);color:white;font-weight:600;cursor:pointer;font-size:15px;}
-.btn.ghost{background:transparent;border:1px solid rgba(0,0,0,0.1);color:var(--text);}
-[data-theme="dark"] .btn.ghost{border:1px solid rgba(255,255,255,0.1);color:var(--text);}
+input,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);font-size:15px;outline:none;color:var(--text);background-color:#1f2937;}
+.btn{padding:10px 14px;border-radius:10px;border:none;color:white;font-weight:600;cursor:pointer;font-size:15px;width: 100%;}
+.btn.income{background:var(--income-btn);} /* New Income button color */
+.btn.outcome{background:var(--outcome-btn);} /* New Outcome button color */
+.btn.accent{background:var(--accent);} /* General accent button */
+.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--text);}
 .danger{background:var(--danger);color:white;}
 .row{display:flex;gap:10px;flex-wrap:wrap;}
 .muted{color:var(--muted);font-size:13px;}
 .expenses{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
-.expense{display:flex;justify-content:space-between;background:rgba(0,0,0,0.03);border-radius:10px;padding:8px;}
-[data-theme="dark"] .expense{background:rgba(255,255,255,0.05);}
-.bottom-nav{display:flex;gap:6px;padding:6px;}
-.nav-btn{flex:1;border:none;border-radius:10px;background:rgba(0,0,0,0.05);color:var(--text);padding:10px 6px;font-weight:600;}
+.expense{display:flex;justify-content:space-between;background:rgba(255,255,255,0.05);border-radius:10px;padding:8px;}
+
+/* --- Fixed Bottom Navigation & Remaining Balance (No change here) --- */
+.bottom-nav{
+  position: fixed; /* Fixed to viewport */
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 420px; /* Match app width */
+  margin: 0 auto;
+  display:flex;
+  align-items: center; /* Center items vertically */
+  gap:8px;
+  padding: 10px 16px; /* Padding for entire bar */
+  background: var(--panel);
+  border-top-left-radius: var(--radius);
+  border-top-right-radius: var(--radius);
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.3);
+  z-index: 100;
+}
+.nav-btn{
+  flex:1;
+  border:none;
+  border-radius:10px;
+  background:rgba(255,255,255,0.05);
+  color:var(--text);
+  padding:10px 6px;
+  font-weight:600;
+  font-size: 14px;
+}
 .nav-btn.active{background:var(--accent);color:white;}
-.small-btn{padding:8px 10px;border-radius:8px;border:1px solid rgba(0,0,0,0.1);background:transparent;font-size:13px;cursor:pointer;color:var(--text);}
-[data-theme="dark"] .small-btn{border:1px solid rgba(255,255,255,0.1);color:var(--text);}
+
+/* Remaining Balance in Nav */
+#navRemaining{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 0;
+}
+#navRemaining .label{
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+#navRemaining .amount{
+  font-family:'Merriweather',serif;
+  font-size: 18px;
+  color: var(--income-btn); /* Highlight Remaining in green */
+}
+
+.small-btn{padding:8px 10px;border-radius:8px;border:1px solid var(--accent);background:transparent;font-size:13px;cursor:pointer;color:var(--text);}
 .modal-back{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);}
 .modal{background:var(--panel);padding:18px;border-radius:12px;max-width:350px;width:90%;}
-svg.pie{width:250px;height:250px;display:block;margin:0 auto;}
+svg.pie{width:180px;height:180px;display:block;margin:10px auto;} /* Smaller chart */
+
+/* Chart View Specific Styles */
+.chart-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.chart-section {
+  padding: 10px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 10px;
+}
+.chart-section .heading {
+  font-weight: 700;
+  font-size: 15px;
+  text-align: center;
+  margin-bottom: 5px;
+  color: var(--accent);
+}
 .legend{margin-top:10px;display:flex;flex-direction:column;gap:6px;}
-.legend-row{display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.04);border-radius:8px;padding:6px 10px;}
+.legend-row{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.06);border-radius:8px;padding:6px 10px;}
 .legend-color{width:16px;height:16px;border-radius:50%;}
-[data-theme="dark"] .legend-row{background:rgba(255,255,255,0.06);}
-.cat-list{margin-top:8px;display:flex;flex-direction:column;gap:6px;}
-.cat-item{display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.03);padding:6px 10px;border-radius:8px;}
-[data-theme="dark"] .cat-item{background:rgba(255,255,255,0.05);}
 </style>
 </head>
-<body data-theme="light">
+<body data-theme="dark">
 <div class="app">
   <header>
     <div>
-      <div class="title">Minimal Budget</div>
+      <div class="title">MinBud</div>
       <div class="subtitle">50 / 30 / 20 budgeting</div>
     </div>
     <div class="row">
-      <button id="themeToggle" class="small-btn">🌗 Theme</button>
-      <button id="donateBtn" class="small-btn">☕ Donate</button>
+      <button id="donateBtn" class="small-btn">Buy me a coffee</button>
     </div>
   </header>
 
   <main id="mainView" class="card">
     <label class="small">Add income</label>
     <div class="row">
-      <input id="incomeInput" type="number" min="0" step="0.01" placeholder="Income amount">
-      <button id="setIncome" class="btn">Add</button>
+      <input id="incomeInput" type="number" min="0" step="0.01" placeholder="Amount">
+      <input id="incomeNote" type="text" placeholder="Note (optional)" style="flex-grow: 1;">
+    </div>
+    <div style="margin-top:8px;">
+      <button id="setIncome" class="btn income">Add Income</button>
     </div>
 
-    <div style="margin-top:12px;display:flex;justify-content:space-between;">
-      <div><div class="muted">Remaining</div><div id="remaining" style="font-family:'Merriweather',serif;font-size:20px;">0</div></div>
-      <button id="resetBtn" class="small-btn danger">Reset</button>
-    </div>
-
-    <hr style="margin:14px 0;border:none;height:1px;background:rgba(0,0,0,0.08)">
+    <hr style="margin:14px 0;border:none;height:1px;background:rgba(255,255,255,0.08)">
 
     <label class="small">Add outcome</label>
     <div class="row">
       <input id="expenseAmount" type="number" min="0.01" step="0.01" placeholder="Amount">
-      <select id="categorySelect"></select>
+      <select id="categorySelect">
+        <option value="Needs">Needs (50%)</option>
+        <option value="Wants">Wants (30%)</option>
+        <option value="Goals">Goals/Savings (20%)</option>
+      </select>
     </div>
     <div class="row" style="margin-top:8px;">
-      <input id="expenseNote" type="text" placeholder="Note (optional)">
-      <button id="addExpenseBtn" class="btn">Add</button>
+      <input id="expenseNote" type="text" placeholder="Note (optional)" style="flex-grow: 1;">
+      <button id="addExpenseBtn" class="btn outcome">Add Outcome</button>
+    </div>
+
+    <hr style="margin:14px 0;border:none;height:1px;background:rgba(255,255,255,0.08)">
+
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div class="muted">Total Budget: <span id="totalIncomeDisplay" style="color:var(--income-btn);font-weight:bold;">0</span></div>
+        <button id="resetBtn" class="small-btn danger">Reset</button>
     </div>
 
     <div style="margin-top:12px;">
-      <label class="small">Categories</label>
-      <div id="catList" class="cat-list"></div>
-      <div class="row" style="margin-top:8px;">
-        <input id="newCategory" type="text" placeholder="Add new category">
-        <button id="addCategoryBtn" class="btn ghost">Add</button>
-      </div>
-    </div>
-
-    <div style="margin-top:12px;">
-      <div class="muted">Recent outcomes</div>
+      <div class="muted">Recent transactions (3 max)</div>
       <div id="recentList" class="expenses"></div>
     </div>
   </main>
 
   <section id="chartView" class="card" style="display:none;">
-    <div class="muted" style="text-align:center;">Outcome Categories</div>
-    <svg id="catPie" class="pie" viewBox="0 0 200 200"></svg>
-    <div id="legend" class="legend"></div>
+    <div class="chart-container">
+      <div class="chart-section">
+        <div class="heading">Target Budget Breakdown (50 / 30 / 20)</div>
+        <svg id="targetPie" class="pie" viewBox="0 0 200 200"></svg>
+        <div id="targetLegend" class="legend"></div>
+      </div>
+      <div class="chart-section" style="margin-top: 20px;">
+        <div class="heading">Actual Outcome Breakdown</div>
+        <svg id="actualPie" class="pie" viewBox="0 0 200 200"></svg>
+        <div id="actualLegend" class="legend"></div>
+      </div>
+    </div>
   </section>
 
   <section id="historyView" class="card" style="display:none;">
@@ -114,6 +251,10 @@ svg.pie{width:250px;height:250px;display:block;margin:0 auto;}
   </section>
 
   <nav class="bottom-nav">
+    <div id="navRemaining">
+        <div class="label">Remaining</div>
+        <div class="amount" id="remaining">0</div>
+    </div>
     <button class="nav-btn active" id="navMain">Main</button>
     <button class="nav-btn" id="navChart">Chart</button>
     <button class="nav-btn" id="navHistory">History</button>
@@ -123,7 +264,7 @@ svg.pie{width:250px;height:250px;display:block;margin:0 auto;}
 <div class="modal-back" id="modalBack">
   <div class="modal">
     <div style="font-family:'Merriweather',serif;font-size:18px;">Reset budget?</div>
-    <p style="font-size:14px;color:var(--muted);">This clears all income and outcomes (categories stay).</p>
+    <p style="font-size:14px;color:var(--muted);">This clears all income and outcomes.</p>
     <div class="row" style="justify-content:flex-end;margin-top:10px;">
       <button id="cancelModal" class="small-btn">Cancel</button>
       <button id="confirmReset" class="small-btn danger">Reset</button>
@@ -132,45 +273,98 @@ svg.pie{width:250px;height:250px;display:block;margin:0 auto;}
 </div>
 
 <script>
-const STORAGE_KEY="minimalBudget_v3";
-let state={income:0,categories:["Rent","Groceries","Utilities","Transport","Car","Entertainment","Misc"],expenses:[]};
+const STORAGE_KEY="minimalBudget_v4";
+// Simplified state: categories are fixed, income now includes a note
+let state={
+  income:0,
+  incomeNotes:[], // Array of {amount, note, date} for income history
+  categories:["Needs","Wants","Goals"], // Fixed categories
+  expenses:[] // Array of {amount, category, note, date}
+};
+const FIXED_CATEGORIES = {
+    Needs: 0.50,
+    Wants: 0.30,
+    Goals: 0.20
+};
+const CATEGORY_COLORS = {
+    Needs: "var(--color-needs)",
+    Wants: "var(--color-wants)",
+    Goals: "var(--color-goals)"
+};
+const MAX_RECENT_TRANSACTIONS=3;
+
 const $=id=>document.getElementById(id);
 function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}
 function load(){let raw=localStorage.getItem(STORAGE_KEY);if(raw)try{state=JSON.parse(raw);}catch{}}
 function formatNum(n){return(Number(n)||0).toLocaleString(undefined,{maximumFractionDigits:2});}
-function renderCategories(){
-  const sel=$("categorySelect");const list=$("catList");
-  sel.innerHTML="";list.innerHTML="";
-  state.categories.forEach((c,i)=>{
-    let o=document.createElement("option");o.value=c;o.textContent=c;sel.appendChild(o);
-    let div=document.createElement("div");div.className="cat-item";
-    div.innerHTML=`<span>${c}</span>`;
-    if(c!=="Misc"){let del=document.createElement("button");del.textContent="❌";del.className="small-btn";del.onclick=()=>{state.categories.splice(i,1);renderAll();};div.appendChild(del);}
-    list.appendChild(div);
-  });
-}
+
+// Replaced renderCategories (categories are fixed)
+
 function renderRecent(){
   const c=$("recentList");c.innerHTML="";
-  let rec=state.expenses.slice().reverse().slice(0,5);
-  if(rec.length===0){c.innerHTML='<div class="muted">No outcomes</div>';return;}
-  rec.forEach(e=>{let div=document.createElement("div");div.className="expense";
-    div.innerHTML=`<div>${e.category}: <b>${formatNum(e.amount)}</b><br><small>${e.note||""}</small></div><div style="text-align:right;"><small>${new Date(e.date).toLocaleString()}</small></div>`;
+  
+  // Combine income and expenses, sort by date, take the latest MAX_RECENT_TRANSACTIONS
+  const allTransactions = [
+      ...state.incomeNotes.map(t => ({...t, type: 'income', amount: Number(t.amount)})),
+      ...state.expenses.map(t => ({...t, type: 'outcome', amount: Number(t.amount) * -1, category: t.category}))
+  ].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  let rec=allTransactions.slice(0,MAX_RECENT_TRANSACTIONS);
+
+  if(rec.length===0){c.innerHTML='<div class="muted">No recent transactions</div>';return;}
+
+  rec.forEach(t=>{
+    let div=document.createElement("div");
+    div.className="expense";
+    let sign = t.type === 'income' ? '+' : '-';
+    let label = t.type === 'income' ? 'INCOME' : t.category;
+    let color = t.type === 'income' ? 'var(--income-btn)' : 'var(--outcome-btn)';
+    let displayAmount = t.type === 'income' ? t.amount : Math.abs(t.amount);
+
+    div.innerHTML=`
+      <div>
+        <span style="color:${color};">${label}</span>: 
+        <b style="color:${color};">${sign}${formatNum(displayAmount)}</b>
+        <br><small>${t.note||""}</small>
+      </div>
+      <div style="text-align:right;"><small>${new Date(t.date).toLocaleDateString()}</small></div>
+    `;
     c.appendChild(div);
   });
 }
+
 function renderHistory(){
   const h=$("historyList");h.innerHTML="";
-  if(state.expenses.length===0){h.innerHTML='<div class="muted">No history</div>';return;}
-  state.expenses.slice().reverse().forEach(e=>{let div=document.createElement("div");div.className="expense";
-    div.innerHTML=`<div>${e.category}: <b>${formatNum(e.amount)}</b><br><small>${e.note||""}</small></div><div style="text-align:right;"><small>${new Date(e.date).toLocaleString()}</small></div>`;
+  const allTransactions = [
+      ...state.incomeNotes.map(t => ({...t, type: 'income', amount: Number(t.amount)})),
+      ...state.expenses.map(t => ({...t, type: 'outcome', amount: Number(t.amount)}))
+  ].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  if(allTransactions.length===0){h.innerHTML='<div class="muted">No history</div>';return;}
+
+  allTransactions.forEach(t=>{
+    let div=document.createElement("div");div.className="expense";
+    let sign = t.type === 'income' ? '+' : '-';
+    let label = t.type === 'income' ? 'INCOME' : t.category;
+    let color = t.type === 'income' ? 'var(--income-btn)' : 'var(--outcome-btn)';
+
+    div.innerHTML=`
+      <div>
+        <span style="color:${color};">${label}</span>: 
+        <b style="color:${color};">${sign}${formatNum(t.amount)}</b>
+        <br><small>${t.note||""}</small>
+      </div>
+      <div style="text-align:right;"><small>${new Date(t.date).toLocaleString()}</small></div>
+    `;
     h.appendChild(div);
   });
 }
-function drawPie(svg,data,colors){
+
+function drawPie(svg, data, colors, isTarget = false){
   svg.innerHTML="";
   let total=data.reduce((s,d)=>s+d.value,0);
   if(total===0){let t=document.createElementNS("http://www.w3.org/2000/svg","text");t.setAttribute("x","100");t.setAttribute("y","105");t.setAttribute("text-anchor","middle");t.textContent="No data";t.setAttribute("fill","var(--muted)");svg.appendChild(t);return;}
-  let start=0;const cx=100,cy=100,r=90;
+  let start=0;const cx=100,cy=100,r=85;
   data.forEach((d,i)=>{
     let val=d.value;if(val<=0)return;
     let angle=(val/total)*2*Math.PI,end=start+angle;
@@ -183,37 +377,134 @@ function drawPie(svg,data,colors){
     svg.appendChild(path);start=end;
   });
 }
+
 function renderCharts(){
-  const colors=["#6d28d9","#f97316","#059669","#06b6d4","#8b5cf6","#ec4899","#10b981","#f59e0b"];
-  let catSum={};state.expenses.forEach(e=>{catSum[e.category]=(catSum[e.category]||0)+Number(e.amount);});
-  let arr=Object.entries(catSum).map(([k,v])=>({label:k,value:v}));
-  drawPie($("catPie"),arr,colors);
-  const legend=$("legend");legend.innerHTML="";
-  arr.forEach((a,i)=>{
-    let row=document.createElement("div");row.className="legend-row";
-    row.innerHTML=`<div style="display:flex;align-items:center;gap:6px;"><div class="legend-color" style="background:${colors[i%colors.length]}"></div>${a.label}</div><div>${formatNum(a.value)}</div>`;
-    legend.appendChild(row);
-  });
+    const { income, expenses } = state;
+    
+    // 1. Target Budget Breakdown (50/30/20 of Total Income)
+    const targetData = [
+        { label: "Needs (50%)", value: income * FIXED_CATEGORIES.Needs, color: CATEGORY_COLORS.Needs },
+        { label: "Wants (30%)", value: income * FIXED_CATEGORIES.Wants, color: CATEGORY_COLORS.Wants },
+        { label: "Goals (20%)", value: income * FIXED_CATEGORIES.Goals, color: CATEGORY_COLORS.Goals }
+    ];
+
+    drawPie($("targetPie"), targetData, targetData.map(d => d.color), true);
+    
+    const targetLegend = $("targetLegend");
+    targetLegend.innerHTML = "";
+    targetData.forEach(d => {
+        let row = document.createElement("div");
+        row.className = "legend-row";
+        row.innerHTML = `
+            <div style="display:flex;align-items:center;gap:6px;">
+                <div class="legend-color" style="background:${d.color}"></div>
+                ${d.label}
+            </div>
+            <div>${formatNum(d.value)}</div>
+        `;
+        targetLegend.appendChild(row);
+    });
+
+    // 2. Actual Outcome Breakdown
+    let actualSum = {};
+    expenses.forEach(e => {
+        actualSum[e.category] = (actualSum[e.category] || 0) + Number(e.amount);
+    });
+
+    const actualData = Object.entries(actualSum).map(([k, v]) => ({
+        label: k,
+        value: v,
+        color: CATEGORY_COLORS[k] || "var(--muted)"
+    }));
+
+    drawPie($("actualPie"), actualData, actualData.map(d => d.color));
+
+    const actualLegend = $("actualLegend");
+    actualLegend.innerHTML = "";
+    actualData.forEach(d => {
+        let row = document.createElement("div");
+        row.className = "legend-row";
+        row.innerHTML = `
+            <div style="display:flex;align-items:center;gap:6px;">
+                <div class="legend-color" style="background:${d.color}"></div>
+                ${d.label}
+            </div>
+            <div>${formatNum(d.value)}</div>
+        `;
+        actualLegend.appendChild(row);
+    });
 }
+
+
 function renderAll(){
-  renderCategories();
-  $("remaining").textContent=formatNum(state.income - state.expenses.reduce((a,b)=>a+Number(b.amount),0));
-  renderRecent();renderHistory();renderCharts();save();
+  const totalExpenses = state.expenses.reduce((a,b)=>a+Number(b.amount),0);
+  const remaining = state.income - totalExpenses;
+  
+  // Update Remaining in Fixed Nav
+  $("remaining").textContent=formatNum(remaining);
+  $("navRemaining").querySelector('.amount').style.color = remaining >= 0 ? 'var(--income-btn)' : 'var(--outcome-btn)'; // Color code remaining
+  
+  // Update Total Income on Main View
+  $("totalIncomeDisplay").textContent=formatNum(state.income);
+
+  renderRecent();
+  renderHistory();
+  renderCharts();
+  save();
 }
-$("themeToggle").onclick=()=>{let t=document.body.getAttribute("data-theme")==="dark"?"light":"dark";document.body.setAttribute("data-theme",t);localStorage.setItem("theme",t);}
+
+// --- Event Listeners ---
 $("donateBtn").onclick=()=>window.open("https://www.buymeacoffee.com/","_blank");
-$("setIncome").onclick=()=>{let v=Number($("incomeInput").value)||0;if(v>0){state.income+=v;$("incomeInput").value="";renderAll();}};
-$("addExpenseBtn").onclick=()=>{let a=Number($("expenseAmount").value)||0;if(a<=0)return;let c=$("categorySelect").value;let n=$("expenseNote").value.trim();state.expenses.push({amount:a,category:c,note:n,date:new Date().toISOString()});$("expenseAmount").value="";$("expenseNote").value="";renderAll();};
-$("addCategoryBtn").onclick=()=>{let n=$("newCategory").value.trim();if(!n)return;if(!state.categories.includes(n))state.categories.push(n);$("newCategory").value="";renderAll();};
+
+// Income Button Logic
+$("setIncome").onclick=()=>{
+    let v=Number($("incomeInput").value)||0;
+    let n=$("incomeNote").value.trim();
+    if(v>0){
+        state.income+=v;
+        state.incomeNotes.push({amount:v, note:n, date: new Date().toISOString()});
+        $("incomeInput").value="";
+        $("incomeNote").value="";
+        renderAll();
+    }
+};
+
+// Expense Button Logic
+$("addExpenseBtn").onclick=()=>{
+    let a=Number($("expenseAmount").value)||0;
+    if(a<=0)return;
+    let c=$("categorySelect").value;
+    let n=$("expenseNote").value.trim();
+    state.expenses.push({amount:a,category:c,note:n,date:new Date().toISOString()});
+    $("expenseAmount").value="";
+    $("expenseNote").value="";
+    renderAll();
+};
+
+// Reset Button Logic
 $("resetBtn").onclick=()=>{$("modalBack").style.display="flex";}
 $("cancelModal").onclick=()=>{$("modalBack").style.display="none";}
-$("confirmReset").onclick=()=>{state.income=0;state.expenses=[];$("modalBack").style.display="none";renderAll();};
-function showView(v){["mainView","chartView","historyView"].forEach(id=>$(id).style.display=id===v?"block":"none");
-["navMain","navChart","navHistory"].forEach(id=>$(id).classList.toggle("active",id.toLowerCase().includes(v.replace("View","").toLowerCase())));}
+$("confirmReset").onclick=()=>{
+    state.income=0;
+    state.expenses=[];
+    state.incomeNotes=[]; // Clear income history too
+    $("modalBack").style.display="none";
+    renderAll();
+};
+
+function showView(v){
+    // Hide all views, then show the selected one
+    ["mainView","chartView","historyView"].forEach(id=>$(id).style.display=id===v?"block":"none");
+    // Update active state in navigation
+    ["navMain","navChart","navHistory"].forEach(id=>$(id).classList.toggle("active",id.toLowerCase().includes(v.replace("View","").toLowerCase())));
+}
 $("navMain").onclick=()=>showView("mainView");
 $("navChart").onclick=()=>showView("chartView");
 $("navHistory").onclick=()=>showView("historyView");
-load();let th=localStorage.getItem("theme");if(th)document.body.setAttribute("data-theme",th);renderAll();
+
+load();
+renderAll();
+showView("mainView"); // Ensure main view is shown on load
 </script>
 </body>
 </html>
