@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>Minimal Budget — 50/30/20</title>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+/* (same color variables and base styles as before) */
+:root{
+  --bg:#f7f8fb;--panel:#fff;--muted:#6b7280;--text:#0f172a;
+  --accent:#6d28d9;--success:#059669;--danger:#ef4444;--radius:14px;
+}
+[data-theme="dark"]{
+  --bg:#0b1220;--panel:#121a2c;--muted:#9aa4b2;--text:#f3f4f6;
+  --accent:#8b5cf6;--success:#10b981;--danger:#fb7185;
+}
+html,body{height:100%;margin:0;font-family:'Lato',system-ui;background:var(--bg);color:var(--text);}
+.app{max-width:420px;margin:20px auto;display:flex;flex-direction:column;min-height:calc(100vh - 40px);gap:16px;padding:16px;}
+header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.title{font-family:'Merriweather',serif;font-size:22px;}
+.subtitle{font-size:13px;color:var(--muted);font-family:'Merriweather',serif;}
+.card{background:var(--panel);border-radius:var(--radius);padding:16px;box-shadow:0 4px 16px rgba(0,0,0,0.06);}
+label.small{font-size:13px;color:var(--muted);display:block;margin-bottom:6px;font-family:'Merriweather',serif;}
+input,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(0,0,0,0.08);font-size:15px;outline:none;color:var(--text);background-color:rgba(255,255,255,0.8);}
+[data-theme="dark"] input,[data-theme="dark"] select{background-color:#1f2937;border:1px solid rgba(255,255,255,0.08);color:var(--text);}
+.btn{padding:10px 14px;border-radius:10px;border:none;background:var(--accent);color:white;font-weight:600;cursor:pointer;font-size:15px;}
+.btn.ghost{background:transparent;border:1px solid rgba(0,0,0,0.1);color:var(--text);}
+[data-theme="dark"] .btn.ghost{border:1px solid rgba(255,255,255,0.1);color:var(--text);}
+.danger{background:var(--danger);color:white;}
+.row{display:flex;gap:10px;flex-wrap:wrap;}
+.muted{color:var(--muted);font-size:13px;}
+.expenses{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+.expense{display:flex;justify-content:space-between;background:rgba(0,0,0,0.03);border-radius:10px;padding:8px;}
+[data-theme="dark"] .expense{background:rgba(255,255,255,0.05);}
+.bottom-nav{display:flex;gap:6px;padding:6px;}
+.nav-btn{flex:1;border:none;border-radius:10px;background:rgba(0,0,0,0.05);color:var(--text);padding:10px 6px;font-weight:600;}
+.nav-btn.active{background:var(--accent);color:white;}
+.small-btn{padding:8px 10px;border-radius:8px;border:1px solid rgba(0,0,0,0.1);background:transparent;font-size:13px;cursor:pointer;color:var(--text);}
+[data-theme="dark"] .small-btn{border:1px solid rgba(255,255,255,0.1);color:var(--text);}
+.modal-back{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);}
+.modal{background:var(--panel);padding:18px;border-radius:12px;max-width:350px;width:90%;}
+svg.pie{width:250px;height:250px;display:block;margin:0 auto;}
+.legend{margin-top:10px;display:flex;flex-direction:column;gap:6px;}
+.legend-row{display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.04);border-radius:8px;padding:6px 10px;}
+.legend-color{width:16px;height:16px;border-radius:50%;}
+[data-theme="dark"] .legend-row{background:rgba(255,255,255,0.06);}
+.cat-list{margin-top:8px;display:flex;flex-direction:column;gap:6px;}
+.cat-item{display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.03);padding:6px 10px;border-radius:8px;}
+[data-theme="dark"] .cat-item{background:rgba(255,255,255,0.05);}
+</style>
+</head>
+<body data-theme="light">
+<div class="app">
+  <header>
+    <div>
+      <div class="title">Minimal Budget</div>
+      <div class="subtitle">50 / 30 / 20 budgeting</div>
+    </div>
+    <div class="row">
+      <button id="themeToggle" class="small-btn">🌗 Theme</button>
+      <button id="donateBtn" class="small-btn">☕ Donate</button>
+    </div>
+  </header>
+
+  <main id="mainView" class="card">
+    <label class="small">Add income</label>
+    <div class="row">
+      <input id="incomeInput" type="number" min="0" step="0.01" placeholder="Income amount">
+      <button id="setIncome" class="btn">Add</button>
+    </div>
+
+    <div style="margin-top:12px;display:flex;justify-content:space-between;">
+      <div><div class="muted">Remaining</div><div id="remaining" style="font-family:'Merriweather',serif;font-size:20px;">0</div></div>
+      <button id="resetBtn" class="small-btn danger">Reset</button>
+    </div>
+
+    <hr style="margin:14px 0;border:none;height:1px;background:rgba(0,0,0,0.08)">
+
+    <label class="small">Add outcome</label>
+    <div class="row">
+      <input id="expenseAmount" type="number" min="0.01" step="0.01" placeholder="Amount">
+      <select id="categorySelect"></select>
+    </div>
+    <div class="row" style="margin-top:8px;">
+      <input id="expenseNote" type="text" placeholder="Note (optional)">
+      <button id="addExpenseBtn" class="btn">Add</button>
+    </div>
+
+    <div style="margin-top:12px;">
+      <label class="small">Categories</label>
+      <div id="catList" class="cat-list"></div>
+      <div class="row" style="margin-top:8px;">
+        <input id="newCategory" type="text" placeholder="Add new category">
+        <button id="addCategoryBtn" class="btn ghost">Add</button>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;">
+      <div class="muted">Recent outcomes</div>
+      <div id="recentList" class="expenses"></div>
+    </div>
+  </main>
+
+  <section id="chartView" class="card" style="display:none;">
+    <div class="muted" style="text-align:center;">Outcome Categories</div>
+    <svg id="catPie" class="pie" viewBox="0 0 200 200"></svg>
+    <div id="legend" class="legend"></div>
+  </section>
+
+  <section id="historyView" class="card" style="display:none;">
+    <div class="muted">History</div>
+    <div id="historyList" class="expenses"></div>
+  </section>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" id="navMain">Main</button>
+    <button class="nav-btn" id="navChart">Chart</button>
+    <button class="nav-btn" id="navHistory">History</button>
+  </nav>
+</div>
+
+<div class="modal-back" id="modalBack">
+  <div class="modal">
+    <div style="font-family:'Merriweather',serif;font-size:18px;">Reset budget?</div>
+    <p style="font-size:14px;color:var(--muted);">This clears all income and outcomes (categories stay).</p>
+    <div class="row" style="justify-content:flex-end;margin-top:10px;">
+      <button id="cancelModal" class="small-btn">Cancel</button>
+      <button id="confirmReset" class="small-btn danger">Reset</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY="minimalBudget_v3";
+let state={income:0,categories:["Rent","Groceries","Utilities","Transport","Car","Entertainment","Misc"],expenses:[]};
+const $=id=>document.getElementById(id);
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}
+function load(){let raw=localStorage.getItem(STORAGE_KEY);if(raw)try{state=JSON.parse(raw);}catch{}}
+function formatNum(n){return(Number(n)||0).toLocaleString(undefined,{maximumFractionDigits:2});}
+function renderCategories(){
+  const sel=$("categorySelect");const list=$("catList");
+  sel.innerHTML="";list.innerHTML="";
+  state.categories.forEach((c,i)=>{
+    let o=document.createElement("option");o.value=c;o.textContent=c;sel.appendChild(o);
+    let div=document.createElement("div");div.className="cat-item";
+    div.innerHTML=`<span>${c}</span>`;
+    if(c!=="Misc"){let del=document.createElement("button");del.textContent="❌";del.className="small-btn";del.onclick=()=>{state.categories.splice(i,1);renderAll();};div.appendChild(del);}
+    list.appendChild(div);
+  });
+}
+function renderRecent(){
+  const c=$("recentList");c.innerHTML="";
+  let rec=state.expenses.slice().reverse().slice(0,5);
+  if(rec.length===0){c.innerHTML='<div class="muted">No outcomes</div>';return;}
+  rec.forEach(e=>{let div=document.createElement("div");div.className="expense";
+    div.innerHTML=`<div>${e.category}: <b>${formatNum(e.amount)}</b><br><small>${e.note||""}</small></div><div style="text-align:right;"><small>${new Date(e.date).toLocaleString()}</small></div>`;
+    c.appendChild(div);
+  });
+}
+function renderHistory(){
+  const h=$("historyList");h.innerHTML="";
+  if(state.expenses.length===0){h.innerHTML='<div class="muted">No history</div>';return;}
+  state.expenses.slice().reverse().forEach(e=>{let div=document.createElement("div");div.className="expense";
+    div.innerHTML=`<div>${e.category}: <b>${formatNum(e.amount)}</b><br><small>${e.note||""}</small></div><div style="text-align:right;"><small>${new Date(e.date).toLocaleString()}</small></div>`;
+    h.appendChild(div);
+  });
+}
+function drawPie(svg,data,colors){
+  svg.innerHTML="";
+  let total=data.reduce((s,d)=>s+d.value,0);
+  if(total===0){let t=document.createElementNS("http://www.w3.org/2000/svg","text");t.setAttribute("x","100");t.setAttribute("y","105");t.setAttribute("text-anchor","middle");t.textContent="No data";t.setAttribute("fill","var(--muted)");svg.appendChild(t);return;}
+  let start=0;const cx=100,cy=100,r=90;
+  data.forEach((d,i)=>{
+    let val=d.value;if(val<=0)return;
+    let angle=(val/total)*2*Math.PI,end=start+angle;
+    let x1=cx+r*Math.cos(start-Math.PI/2),y1=cy+r*Math.sin(start-Math.PI/2);
+    let x2=cx+r*Math.cos(end-Math.PI/2),y2=cy+r*Math.sin(end-Math.PI/2);
+    let large=angle>Math.PI?1:0;
+    let path=document.createElementNS("http://www.w3.org/2000/svg","path");
+    path.setAttribute("d",`M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${large} 1 ${x2},${y2} Z`);
+    path.setAttribute("fill",colors[i%colors.length]);
+    svg.appendChild(path);start=end;
+  });
+}
+function renderCharts(){
+  const colors=["#6d28d9","#f97316","#059669","#06b6d4","#8b5cf6","#ec4899","#10b981","#f59e0b"];
+  let catSum={};state.expenses.forEach(e=>{catSum[e.category]=(catSum[e.category]||0)+Number(e.amount);});
+  let arr=Object.entries(catSum).map(([k,v])=>({label:k,value:v}));
+  drawPie($("catPie"),arr,colors);
+  const legend=$("legend");legend.innerHTML="";
+  arr.forEach((a,i)=>{
+    let row=document.createElement("div");row.className="legend-row";
+    row.innerHTML=`<div style="display:flex;align-items:center;gap:6px;"><div class="legend-color" style="background:${colors[i%colors.length]}"></div>${a.label}</div><div>${formatNum(a.value)}</div>`;
+    legend.appendChild(row);
+  });
+}
+function renderAll(){
+  renderCategories();
+  $("remaining").textContent=formatNum(state.income - state.expenses.reduce((a,b)=>a+Number(b.amount),0));
+  renderRecent();renderHistory();renderCharts();save();
+}
+$("themeToggle").onclick=()=>{let t=document.body.getAttribute("data-theme")==="dark"?"light":"dark";document.body.setAttribute("data-theme",t);localStorage.setItem("theme",t);}
+$("donateBtn").onclick=()=>window.open("https://www.buymeacoffee.com/","_blank");
+$("setIncome").onclick=()=>{let v=Number($("incomeInput").value)||0;if(v>0){state.income+=v;$("incomeInput").value="";renderAll();}};
+$("addExpenseBtn").onclick=()=>{let a=Number($("expenseAmount").value)||0;if(a<=0)return;let c=$("categorySelect").value;let n=$("expenseNote").value.trim();state.expenses.push({amount:a,category:c,note:n,date:new Date().toISOString()});$("expenseAmount").value="";$("expenseNote").value="";renderAll();};
+$("addCategoryBtn").onclick=()=>{let n=$("newCategory").value.trim();if(!n)return;if(!state.categories.includes(n))state.categories.push(n);$("newCategory").value="";renderAll();};
+$("resetBtn").onclick=()=>{$("modalBack").style.display="flex";}
+$("cancelModal").onclick=()=>{$("modalBack").style.display="none";}
+$("confirmReset").onclick=()=>{state.income=0;state.expenses=[];$("modalBack").style.display="none";renderAll();};
+function showView(v){["mainView","chartView","historyView"].forEach(id=>$(id).style.display=id===v?"block":"none");
+["navMain","navChart","navHistory"].forEach(id=>$(id).classList.toggle("active",id.toLowerCase().includes(v.replace("View","").toLowerCase())));}
+$("navMain").onclick=()=>showView("mainView");
+$("navChart").onclick=()=>showView("chartView");
+$("navHistory").onclick=()=>showView("historyView");
+load();let th=localStorage.getItem("theme");if(th)document.body.setAttribute("data-theme",th);renderAll();
+</script>
+</body>
+</html>
